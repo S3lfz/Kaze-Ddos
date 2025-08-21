@@ -9,7 +9,7 @@ with open('config.json') as f:
 
 TOKEN = config['token']
 PREFIX = config['prefix']
-GUILD_ID = "1407533053055864923"
+GUILD_ID = "Your id server"
 
 intents = discord.Intents.default()
 intents.message_content = True
