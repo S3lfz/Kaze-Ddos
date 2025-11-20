@@ -10,7 +10,7 @@ async def on_ready(): print(f'On {bt.user}')
 async def spam(i: discord.Interaction):
     await i.response.send_message("intosmoke", ephemeral=True)
     for _ in range(20):
-        await i.followup.send("[/404 Pwned This](https://discord.gg/5WbtZedcwt)")
+        await i.followup.send("[/404 Pwned This](https://discord.gg/QXWz2UqxGb)")
         await asyncio.sleep(0.1)
 
 bt.run("") #Your bot token
